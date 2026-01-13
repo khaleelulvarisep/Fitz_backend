@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import RegisterSerializer
+from rest_framework.permissions import IsAuthenticated
+
 
 class RegisterAPIView(APIView):
 
@@ -14,5 +16,16 @@ class RegisterAPIView(APIView):
                 status=status.HTTP_201_CREATED
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            "id": user.id,
+            "email": user.email,
+            "name": user.name,        # if exists
+            "isAdmin": user.is_staff
+        })
 
 # Create your views here.
