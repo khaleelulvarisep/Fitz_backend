@@ -17,3 +17,32 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data.pop('confirm_password')
         return User.objects.create_user(**validated_data)
+from rest_framework import serializers
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True, required=False, min_length=6
+    )
+
+    class Meta:
+        model = User
+        fields = ["id", "name", "password"]
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+
+        # Update normal fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        # Handle password properly
+        if password:
+            instance.set_password(password)
+
+        instance.save()
+        return instance
+
