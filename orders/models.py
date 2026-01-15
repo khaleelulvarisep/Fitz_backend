@@ -17,18 +17,24 @@ class Order(models.Model):
         ("CANCELLED", "Cancelled"),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    address = models.TextField(null=True, blank=True)
+    city = models.CharField(max_length=50, null=True, blank=True)
+    state = models.CharField(max_length=50, null=True, blank=True)
+    pincode = models.CharField(max_length=10, null=True, blank=True)
+    phone = models.CharField(max_length=15, null=True, blank=True)
+    full_name = models.CharField(max_length=100, null=True, blank=True)
+
+
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHODS)
-    payment_status = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, default="PENDING"
-    )
+    payment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Order #{self.id}"
+    created_at = models.DateTimeField(auto_now_add=True)
     
 
 class OrderItem(models.Model):

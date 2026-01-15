@@ -16,21 +16,29 @@ class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        payment_method = request.data.get("payment_method")
+        data = request.data
         cart = Cart.objects.get(user=request.user)
 
         total = sum(
             item.product.price * item.quantity for item in cart.items.all()
         )
 
+        order_data = {
+            "user": request.user,
+            "full_name": data["full_name"],
+            "phone": data["phone"],
+            "address": data["address"],
+            "city": data["city"],
+            "state": data["state"],
+            "pincode": data["pincode"],
+            # "notes": data.get("notes", ""),
+            "payment_method": data["payment_method"],
+            "total_amount": total,
+        }
+
         # 👉 CASH ON DELIVERY
-        if payment_method == "COD":
-            order = Order.objects.create(
-                user=request.user,
-                payment_method="COD",
-                payment_status="PENDING",
-                total_amount=total,
-            )
+        if data["payment_method"] == "COD":
+            order = Order.objects.create(**order_data)
 
             for item in cart.items.all():
                 OrderItem.objects.create(
@@ -41,34 +49,25 @@ class CreateOrderView(APIView):
                 )
 
             cart.items.all().delete()
+            return Response({"message": "Order placed successfully"})
 
-            return Response({"message": "Order placed with COD"})
-
-        # 👉 ONLINE PAYMENT (RAZORPAY)
-        razorpay_order = client.order.create(
-            {
-                "amount": int(total * 100),
-                "currency": "INR",
-                "payment_capture": 1,
-            }
-        )
+        # 👉 ONLINE PAYMENT
+        razorpay_order = client.order.create({
+            "amount": int(total * 100),
+            "currency": "INR",
+            "payment_capture": 1,
+        })
 
         order = Order.objects.create(
-            user=request.user,
-            payment_method="ONLINE",
-            payment_status="PENDING",
-            total_amount=total,
+            **order_data,
             razorpay_order_id=razorpay_order["id"],
         )
 
-        return Response(
-            {
-                "order_id": order.id,
-                "razorpay_order_id": razorpay_order["id"],
-                "amount": total,
-                "key": settings.RAZORPAY_KEY_ID,
-            }
-        )
+        return Response({
+            "razorpay_order_id": razorpay_order["id"],
+            "amount": total,
+            "key": settings.RAZORPAY_KEY_ID,
+        })
 
 
 class VerifyPaymentView(APIView):
