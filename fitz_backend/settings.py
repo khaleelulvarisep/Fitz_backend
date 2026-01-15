@@ -55,6 +55,11 @@ REST_FRAMEWORK = {
     ),
 }
 
+
+RAZORPAY_KEY_ID = "rzp_test_S41yvaK1y0JQCi"
+RAZORPAY_KEY_SECRET = "kXPY3NeyIfK8OcwF2BD4peRk"
+
+
 SIMPLE_JWT = {
     'USER_ID_FIELD':'id',
     'USER_ID_CLAIM':'user_id',
