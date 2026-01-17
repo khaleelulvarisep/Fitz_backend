@@ -7,6 +7,8 @@ from carts.models import Cart
 from .models import Order, OrderItem
 from .serializers import OrderSerializer
 from products.models import Product
+from products.models import Product
+from carts.models import Cart, CartItem
 
 
 client = razorpay.Client(
@@ -14,8 +16,7 @@ client = razorpay.Client(
 )
 
 
-from products.models import Product
-from carts.models import Cart, CartItem
+
 
 class CreateOrderView(APIView):
     permission_classes = [IsAuthenticated]
@@ -97,13 +98,61 @@ class CreateOrderView(APIView):
         order = Order.objects.create(
             **order_data,
             razorpay_order_id=razorpay_order["id"],
+            buy_now_product=product if product_id else None,
+            buy_now_quantity=quantity if product_id else None,
         )
 
         return Response({
             "razorpay_order_id": razorpay_order["id"],
             "amount": total,
             "key": settings.RAZORPAY_KEY_ID,
+            "order_id": order.id,
         })
+
+# class VerifyPaymentView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def post(self, request):
+#         data = request.data
+
+#         client.utility.verify_payment_signature(
+#             {
+#                 "razorpay_order_id": data["razorpay_order_id"],
+#                 "razorpay_payment_id": data["razorpay_payment_id"],
+#                 "razorpay_signature": data["razorpay_signature"],
+#             }
+#         )
+
+#         order = Order.objects.get(razorpay_order_id=data["razorpay_order_id"])
+#         order.payment_status = "PAID"
+#         order.razorpay_payment_id = data["razorpay_payment_id"]
+#         order.save()
+
+#          # 🔥 BUY NOW CASE
+#         if order.buy_now_product:
+#             OrderItem.objects.create(
+#                 order=order,
+#                 product=order.buy_now_product,
+#                 quantity=order.buy_now_quantity,
+#                 price=order.buy_now_product.price,
+#             )
+
+#         # 🔥 CART CHECKOUT CASE
+#         else:
+#             cart = Cart.objects.get(user=request.user)
+#             for item in cart.items.all():
+#                 OrderItem.objects.create(
+#                     order=order,
+#                     product=item.product,
+#                     quantity=item.quantity,
+#                     price=item.product.price,
+#                 )
+#             cart.items.all().delete()
+
+#         cart.items.all().delete()
+
+#         return Response({"message": "Payment successful"})
+from razorpay.errors import SignatureVerificationError
 
 class VerifyPaymentView(APIView):
     permission_classes = [IsAuthenticated]
@@ -111,31 +160,43 @@ class VerifyPaymentView(APIView):
     def post(self, request):
         data = request.data
 
-        client.utility.verify_payment_signature(
-            {
+        try:
+            client.utility.verify_payment_signature({
                 "razorpay_order_id": data["razorpay_order_id"],
                 "razorpay_payment_id": data["razorpay_payment_id"],
                 "razorpay_signature": data["razorpay_signature"],
-            }
-        )
+            })
+        except SignatureVerificationError:
+            return Response({"error": "Invalid payment signature"}, status=400)
 
         order = Order.objects.get(razorpay_order_id=data["razorpay_order_id"])
         order.payment_status = "PAID"
         order.razorpay_payment_id = data["razorpay_payment_id"]
         order.save()
 
-        cart = Cart.objects.get(user=request.user)
-        for item in cart.items.all():
+        # 🔥 BUY NOW CASE
+        if order.buy_now_product:
             OrderItem.objects.create(
                 order=order,
-                product=item.product,
-                quantity=item.quantity,
-                price=item.product.price,
+                product=order.buy_now_product,
+                quantity=order.buy_now_quantity,
+                price=order.buy_now_product.price,
             )
 
-        cart.items.all().delete()
+        # 🔥 CART CHECKOUT CASE
+        else:
+            cart = Cart.objects.get(user=request.user)
+            for item in cart.items.all():
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    quantity=item.quantity,
+                    price=item.product.price,
+                )
+            cart.items.all().delete()
 
         return Response({"message": "Payment successful"})
+
 class MyOrdersView(APIView):
     permission_classes = [IsAuthenticated]
 

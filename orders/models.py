@@ -35,7 +35,12 @@ class Order(models.Model):
     razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
     
+    buy_now_product = models.ForeignKey(
+        Product, null=True, blank=True, on_delete=models.SET_NULL
+    )
+    buy_now_quantity = models.PositiveIntegerField(null=True, blank=True)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)

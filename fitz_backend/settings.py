@@ -64,7 +64,7 @@ RAZORPAY_KEY_SECRET = "kXPY3NeyIfK8OcwF2BD4peRk"
 SIMPLE_JWT = {
     'USER_ID_FIELD':'id',
     'USER_ID_CLAIM':'user_id',
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
