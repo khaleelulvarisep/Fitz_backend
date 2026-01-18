@@ -174,7 +174,7 @@ class VerifyPaymentView(APIView):
         order.razorpay_payment_id = data["razorpay_payment_id"]
         order.save()
 
-        # 🔥 BUY NOW CASE
+        #  BUY NOW CASE
         if order.buy_now_product:
             OrderItem.objects.create(
                 order=order,
@@ -183,7 +183,7 @@ class VerifyPaymentView(APIView):
                 price=order.buy_now_product.price,
             )
 
-        # 🔥 CART CHECKOUT CASE
+        #  CART CHECKOUT CASE
         else:
             cart = Cart.objects.get(user=request.user)
             for item in cart.items.all():
@@ -259,11 +259,11 @@ class BuyNowOrderView(APIView):
             )
 
             return Response({
-                "message": "Order placed successfully",
+                "message": "Order placed successfully.",
                 "order_id": order.id
             })
 
-        # ✅ ONLINE PAYMENT (RAZORPAY)
+        #  ONLINE PAYMENT (RAZORPAY)
         razorpay_order = client.order.create({
             "amount": int(total * 100),  # paise
             "currency": "INR",
