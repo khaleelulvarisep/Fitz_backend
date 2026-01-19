@@ -3,6 +3,36 @@ from .models import User
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.exceptions import AuthenticationFailed
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import check_password
+
+User = get_user_model()
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise AuthenticationFailed("Invalid email or password.")
+
+        if not user.check_password(password):
+            raise AuthenticationFailed("Invalid email or password.")
+
+        if not user.is_active:
+            raise AuthenticationFailed("Your account has been blocked by the admin.")
+
+        self.user = user
+        return super().validate(attrs)
+
+
+
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
