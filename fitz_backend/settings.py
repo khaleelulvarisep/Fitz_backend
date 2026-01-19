@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'carts',
     'wishlist',
     'orders',
+    'adminpage',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
