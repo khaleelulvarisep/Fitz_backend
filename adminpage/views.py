@@ -3,7 +3,10 @@ from rest_framework.views import APIView
 from accounts.models import User
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserSerializer,UserBlockSerializer
+from .serializers import UserSerializer,UserBlockSerializer,ProductSerializer
+from products.models import Product
+
+
 class UsersViewApi(APIView):
     def get(self,request):
         users=User.objects.all()
@@ -21,5 +24,13 @@ class UserBlockApi(APIView):
                 "is_active": user.is_active
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=400)
+
+
+
+class ProductViewApi(APIView):
+    def get(self,request):
+        products=Product.objects.all()
+        serializer=ProductSerializer(products,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 # Create your views here.
