@@ -3,7 +3,8 @@ from rest_framework.views import APIView
 from accounts.models import User
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserSerializer,UserBlockSerializer,ProductSerializer,OrderSerializer
+from .serializers import UserSerializer,UserBlockSerializer,ProductSerializer
+from orders.serializers import OrderSerializer
 from products.models import Product
 from orders.models import Order
 from rest_framework.permissions import IsAdminUser
@@ -84,9 +85,15 @@ class ProductDetailAPIView(APIView):
 
 
 
+# class OrderListApiView(APIView):
+#     def get(self,request):
+#         orders=Order.objects.all()
+#         serializer=OrderSerializer(orders,many=True)
+#         return Response(serializer.data,status=status.HTTP_200_OK)
 class OrderListApiView(APIView):
-    def get(self,request):
-        orders=Order.objects.all()
-        serializer=OrderSerializer(orders,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+    def get(self, request):
+        orders = Order.objects.all().order_by("-created_at")
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 # Create your views here.

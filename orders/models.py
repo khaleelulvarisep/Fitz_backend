@@ -11,10 +11,16 @@ class Order(models.Model):
         ("ONLINE", "Online Payment"),
     )
 
-    STATUS_CHOICES = (
+    PAYMENT_STATUS_CHOICES = (
         ("PENDING", "Pending"),
         ("PAID", "Paid"),
         ("CANCELLED", "Cancelled"),
+    )
+    STATUS_CHOICES = (
+        ("DELIVERED", "Delivered"),
+        ("CANCELLED", "Cancelled"),
+        ("SHIPPED", "Shipped"),
+        ("PLACED", "Placed"),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -28,7 +34,8 @@ class Order(models.Model):
 
 
     payment_method = models.CharField(max_length=10, choices=PAYMENT_METHODS)
-    payment_status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="PENDING")
+    payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default="PENDING")
+    status=models.CharField(max_length=10, choices=STATUS_CHOICES, default="PLACED")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
 
     razorpay_order_id = models.CharField(max_length=100, blank=True, null=True)
@@ -41,6 +48,8 @@ class Order(models.Model):
         Product, null=True, blank=True, on_delete=models.SET_NULL
     )
     buy_now_quantity = models.PositiveIntegerField(null=True, blank=True)
+
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name="items", on_delete=models.CASCADE)

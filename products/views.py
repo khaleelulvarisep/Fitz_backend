@@ -9,7 +9,6 @@ class ProductListView(APIView):
     permission_classes = [AllowAny]  # 👈 Public API
 
     def get(self, request):
-        print("-----User---",request.user)
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
