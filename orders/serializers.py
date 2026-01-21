@@ -5,6 +5,7 @@ from .models import Order, OrderItem
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_name = serializers.ReadOnlyField(source="product.name")
+    description = serializers.ReadOnlyField(source="product.description")
     image = serializers.SerializerMethodField()
 
     class Meta:
@@ -16,6 +17,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
             "image",
             "quantity",
             "price",
+            "description",
         ]
 
     def get_image(self, obj):

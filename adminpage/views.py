@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from accounts.models import User
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserSerializer,UserBlockSerializer,ProductSerializer
+from .serializers import UserSerializer,UserBlockSerializer,ProductSerializer,OrderStatusUpdateSerializer
 from orders.serializers import OrderSerializer
 from products.models import Product
 from orders.models import Order
@@ -96,4 +96,32 @@ class OrderListApiView(APIView):
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+class OrderStatusUpdateApiView(APIView):
+    def patch(self, request, order_id):
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response(
+                {"error": "Order not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = OrderStatusUpdateSerializer(
+            order,
+            data=request.data,
+            partial=True
+        )
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "message": "Order status updated successfully",
+                    "status": serializer.data["status"]
+                },
+                status=status.HTTP_200_OK
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # Create your views here.
