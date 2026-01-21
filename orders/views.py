@@ -9,6 +9,7 @@ from .serializers import OrderSerializer
 from products.models import Product
 from products.models import Product
 from carts.models import Cart, CartItem
+from razorpay.errors import SignatureVerificationError
 
 
 client = razorpay.Client(
@@ -109,50 +110,7 @@ class CreateOrderView(APIView):
             "order_id": order.id,
         })
 
-# class VerifyPaymentView(APIView):
-#     permission_classes = [IsAuthenticated]
 
-#     def post(self, request):
-#         data = request.data
-
-#         client.utility.verify_payment_signature(
-#             {
-#                 "razorpay_order_id": data["razorpay_order_id"],
-#                 "razorpay_payment_id": data["razorpay_payment_id"],
-#                 "razorpay_signature": data["razorpay_signature"],
-#             }
-#         )
-
-#         order = Order.objects.get(razorpay_order_id=data["razorpay_order_id"])
-#         order.payment_status = "PAID"
-#         order.razorpay_payment_id = data["razorpay_payment_id"]
-#         order.save()
-
-#          # 🔥 BUY NOW CASE
-#         if order.buy_now_product:
-#             OrderItem.objects.create(
-#                 order=order,
-#                 product=order.buy_now_product,
-#                 quantity=order.buy_now_quantity,
-#                 price=order.buy_now_product.price,
-#             )
-
-#         # 🔥 CART CHECKOUT CASE
-#         else:
-#             cart = Cart.objects.get(user=request.user)
-#             for item in cart.items.all():
-#                 OrderItem.objects.create(
-#                     order=order,
-#                     product=item.product,
-#                     quantity=item.quantity,
-#                     price=item.product.price,
-#                 )
-#             cart.items.all().delete()
-
-#         cart.items.all().delete()
-
-#         return Response({"message": "Payment successful"})
-from razorpay.errors import SignatureVerificationError
 
 class VerifyPaymentView(APIView):
     permission_classes = [IsAuthenticated]
