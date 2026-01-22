@@ -221,7 +221,7 @@ class BuyNowOrderView(APIView):
                 "order_id": order.id
             })
 
-        #  ONLINE PAYMENT (RAZORPAY)
+        #  ONLINE          PAYMENT (RAZORPAY)
         razorpay_order = client.order.create({
             "amount": int(total * 100),  # paise
             "currency": "INR",
