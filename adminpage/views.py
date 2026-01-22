@@ -128,6 +128,5 @@ class OrderOfSpecificUserApiView(APIView):
     def get(self,request,pk):
         orders=Order.objects.filter(user_id=pk)
         serializer=OrderSerializer(orders,many=True)
-        print(serializer.data)
         return Response(serializer.data,status=status.HTTP_200_OK)
 # Create your views here.
