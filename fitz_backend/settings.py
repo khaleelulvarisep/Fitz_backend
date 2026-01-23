@@ -71,6 +71,22 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
+
+SWAGGER_SETTINGS = {
+    # disable session (login) auth in Swagger UI
+    "USE_SESSION_AUTH": False,
+
+    # declare the Bearer token scheme
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    },
+}
+
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
