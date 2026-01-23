@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'wishlist',
     'orders',
     'adminpage',
+    'drf_yasg',
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
