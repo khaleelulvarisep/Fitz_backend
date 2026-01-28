@@ -32,6 +32,7 @@ schema_view = get_schema_view(
 )
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/auth/', include('accounts.urls')),
     path('api/products/', include('products.urls')),
     path('api/cart/', include('carts.urls')),
@@ -40,7 +41,6 @@ urlpatterns = [
     path('api/admin/',include('adminpage.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-
-    
+   
 ]
 

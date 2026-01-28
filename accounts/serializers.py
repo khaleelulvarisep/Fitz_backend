@@ -77,3 +77,55 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+from rest_framework_simplejwt.tokens import RefreshToken
+
+User = get_user_model()
+
+
+class GoogleAuthSerializer(serializers.Serializer):
+    access_token = serializers.CharField()
+
+    def validate(self, attrs):
+        token = attrs.get("access_token")
+
+        try:
+            idinfo = id_token.verify_oauth2_token(
+                token,
+                requests.Request(),
+                audience=None  # We will validate manually
+            )
+
+            if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+                raise serializers.ValidationError("Wrong issuer.")
+
+        except Exception:
+            raise serializers.ValidationError("Invalid or expired Google token.")
+
+        email = idinfo.get("email")
+        name = idinfo.get("name")
+
+        if not email:
+            raise serializers.ValidationError("Email not provided by Google.")
+
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={"name": name}
+        )
+
+        if created:
+            user.set_unusable_password()
+            user.save()
+
+        tokens = RefreshToken.for_user(user)
+
+        return {
+            "user": user,
+            "access": str(tokens.access_token),
+            "refresh": str(tokens),
+        }

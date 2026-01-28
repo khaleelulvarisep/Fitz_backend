@@ -1,4 +1,5 @@
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from products.models import Product
@@ -11,7 +12,7 @@ class CartView(APIView):
 
     def get(self, request):
         cart, _ = Cart.objects.get_or_create(user=request.user)
-        return Response(CartSerializer(cart).data)
+        return Response(CartSerializer(cart).data,status=status.HTTP_200_OK)
 
     def post(self, request):
         cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -20,7 +21,7 @@ class CartView(APIView):
         if not product_id:
             return Response(
                 {"error": "product_id is required"},
-                status=400
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
@@ -28,7 +29,7 @@ class CartView(APIView):
         except Product.DoesNotExist:
             return Response(
                 {"error": "Product not found"},
-                status=404
+                status=status.HTTP_404_NOT_FOUND
             )
 
         item, created = CartItem.objects.get_or_create(
@@ -39,7 +40,7 @@ class CartView(APIView):
             item.quantity += 1
             item.save()
 
-        return Response(CartSerializer(cart).data)
+        return Response(CartSerializer(cart).data,status=status.HTTP_200_OK)
 
 
 class CartItemUpdateView(APIView):
@@ -51,7 +52,7 @@ class CartItemUpdateView(APIView):
         if quantity is None or quantity < 1:
             return Response(
                 {"error": "Quantity must be at least 1"},
-                status=400
+                status=status.HTTP_400_BAD_REQUEST
             )
 
         try:
@@ -62,13 +63,13 @@ class CartItemUpdateView(APIView):
         except CartItem.DoesNotExist:
             return Response(
                 {"error": "Item not found in cart"},
-                status=404
+                status=status.HTTP_404_NOT_FOUND
             )
 
         item.quantity = quantity
         item.save()
 
-        return Response(CartSerializer(item.cart).data)
+        return Response(CartSerializer(item.cart).data,status=status.HTTP_200_OK)
 
     def delete(self, request, product_id):
         try:
@@ -79,9 +80,9 @@ class CartItemUpdateView(APIView):
         except CartItem.DoesNotExist:
             return Response(
                 {"error": "Item not found"},
-                status=404
+                status=status.HTTP_404_NOT_FOUND
             )
 
         item.delete()
         cart = Cart.objects.get(user=request.user)
-        return Response(CartSerializer(cart).data)
+        return Response(CartSerializer(cart).data,status=status.HTTP_200_OK)

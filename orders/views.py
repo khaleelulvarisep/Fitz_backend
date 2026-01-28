@@ -1,6 +1,7 @@
 import razorpay
 from django.conf import settings
 from rest_framework.views import APIView
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from carts.models import Cart
@@ -48,7 +49,7 @@ class CreateOrderView(APIView):
             cart = Cart.objects.get(user=request.user)
 
             if not cart.items.exists():
-                return Response({"error": "Cart is empty"}, status=400)
+                return Response({"error": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
 
             for item in cart.items.all():
                 total += item.product.price * item.quantity
@@ -87,7 +88,7 @@ class CreateOrderView(APIView):
             if not product_id:
                 cart.items.all().delete()
 
-            return Response({"message": "Order placed successfully"})
+            return Response({"message": "Order placed successfully"},status=status.HTTP_200_OK)
 
         # ================= ONLINE PAYMENT =================
         razorpay_order = client.order.create({
@@ -125,7 +126,7 @@ class VerifyPaymentView(APIView):
                 "razorpay_signature": data["razorpay_signature"],
             })
         except SignatureVerificationError:
-            return Response({"error": "Invalid payment signature"}, status=400)
+            return Response({"error": "Invalid payment signature"}, status=status.HTTP_400_BAD_REQUEST)
 
         order = Order.objects.get(razorpay_order_id=data["razorpay_order_id"])
         order.payment_status = "PAID"
@@ -153,7 +154,7 @@ class VerifyPaymentView(APIView):
                 )
             cart.items.all().delete()
 
-        return Response({"message": "Payment successful"})
+        return Response({"message": "Payment successful"},status=status.HTTP_200_OK)
 
 class MyOrdersView(APIView):
     permission_classes = [IsAuthenticated]
@@ -161,7 +162,7 @@ class MyOrdersView(APIView):
     def get(self, request):
         orders = Order.objects.filter(user=request.user).order_by("-created_at")
         serializer = OrderSerializer(orders,many=True,context={"request": request})
-        return Response(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 
 class OrderDetailView(APIView):
@@ -170,7 +171,7 @@ class OrderDetailView(APIView):
     def get(self, request, order_id):
         order = Order.objects.get(id=order_id, user=request.user)
         serializer = OrderSerializer( order, context={"request": request})
-        return Response(serializer.data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
 
 
 
@@ -219,7 +220,7 @@ class BuyNowOrderView(APIView):
             return Response({
                 "message": "Order placed successfully.",
                 "order_id": order.id
-            })
+            },status=status.HTTP_200_OK)
 
         #  ONLINE          PAYMENT (RAZORPAY)
         razorpay_order = client.order.create({
@@ -238,4 +239,4 @@ class BuyNowOrderView(APIView):
             "amount": total,
             "key": settings.RAZORPAY_KEY_ID,
             "order_id": order.id
-        })
+        },status=status.HTTP_200_OK)

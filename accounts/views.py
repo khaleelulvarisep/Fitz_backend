@@ -7,6 +7,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomTokenObtainPairSerializer
 
+
+
+
+from .serializers import GoogleAuthSerializer
+
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
@@ -46,3 +52,26 @@ class UserMeView(APIView):
         return Response(serializer.errors, status=400)
 
 # Create your views here.
+
+
+
+
+class GoogleAuthAPIView(APIView):
+    def post(self, request):
+        serializer = GoogleAuthSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.validated_data
+            return Response(
+                {
+                    "access": data["access"],
+                    "refresh": data["refresh"],
+                    "user": {
+                        "id": data["user"].id,
+                        "email": data["user"].email,
+                        "name": data["user"].name,
+                    }
+                },
+                status=status.HTTP_200_OK
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

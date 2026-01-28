@@ -85,12 +85,9 @@ class ProductDetailAPIView(APIView):
 
 
 
-# class OrderListApiView(APIView):
-#     def get(self,request):
-#         orders=Order.objects.all()
-#         serializer=OrderSerializer(orders,many=True)
-#         return Response(serializer.data,status=status.HTTP_200_OK)
+
 class OrderListApiView(APIView):
+    permission_classes = [IsAdminUser]
     def get(self, request):
         orders = Order.objects.all().order_by("-created_at")
         serializer = OrderSerializer(orders, many=True)
@@ -98,6 +95,7 @@ class OrderListApiView(APIView):
 
 
 class OrderStatusUpdateApiView(APIView):
+    permission_classes = [IsAdminUser]
     def patch(self, request, order_id):
         try:
             order = Order.objects.get(id=order_id)
@@ -124,7 +122,11 @@ class OrderStatusUpdateApiView(APIView):
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    
 class OrderOfSpecificUserApiView(APIView):
+    permission_classes = [IsAdminUser]
     def get(self,request,pk):
         orders=Order.objects.filter(user_id=pk)
         serializer=OrderSerializer(orders,many=True)
