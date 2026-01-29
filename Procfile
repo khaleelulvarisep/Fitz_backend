@@ -1,1 +1,2 @@
-web: gunicorn fitz_backend.wsgi
+web: gunicorn fitz_backend.wsgi:application
+
