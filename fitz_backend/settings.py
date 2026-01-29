@@ -30,9 +30,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-w$%r*%f1p+$jfskqb9oci9t7hnt^bxg6co)t+_2=)sqfzdke+='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+
+DEBUG = False  # Don't show sensitive info in production
+ALLOWED_HOSTS = ["*"]  # Replace '*' with your domain later
+
 
 
 # Application definition
@@ -179,11 +181,22 @@ WSGI_APPLICATION = 'fitz_backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'fitz_db',
+#         'USER': 'postgres',
+#         'PASSWORD': '275498',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'fitz_db',
-        'USER': 'postgres',
+        'USER': 'fitz_user',
         'PASSWORD': '275498',
         'HOST': 'localhost',
         'PORT': '5432',
@@ -226,4 +239,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
