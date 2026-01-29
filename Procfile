@@ -1,2 +1,2 @@
-web: gunicorn fitz_backend.wsgi:application
+web: gunicorn fitz_backend.wsgi:application --bind 0.0.0.0:8000
 
