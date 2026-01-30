@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 from dotenv import load_dotenv
 import os
-
+import dj_database_url
 
 from pathlib import Path
 from datetime import timedelta
@@ -192,17 +192,34 @@ WSGI_APPLICATION = 'fitz_backend.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fitz_db',
-        'USER': 'fitz_user',
-        'PASSWORD': '275498',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'fitz_db',
+#         'USER': 'fitz_user',
+#         'PASSWORD': '275498',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# # }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'postgres',
+#         'PASSWORD': 'K#aleelulvaris@123',
+#         'HOST': 'db.icfmcszibyhlmcmoyivp.supabase.co',
+#         'PORT': '5432',
+#     }
+# }
 
+DATABASES = {
+    'default': dj_database_url.parse(
+        os.getenv("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
 
 
 # Password validation
