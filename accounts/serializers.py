@@ -18,13 +18,13 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            raise AuthenticationFailed("Invalid email or password.")
+            raise AuthenticationFailed("Invalid email or password")
 
         if not user.check_password(password):
-            raise AuthenticationFailed("Invalid email or password.")
+            raise AuthenticationFailed("Invalid email or password")
 
         if not user.is_active:
-            raise AuthenticationFailed("Your account has been blocked by the admin khaleel.")
+            raise AuthenticationFailed("Your account has been blocked by the admin")
 
         self.user = user
         return super().validate(attrs)
