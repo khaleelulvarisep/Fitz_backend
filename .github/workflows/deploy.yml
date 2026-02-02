@@ -1,0 +1,26 @@
+name: Deploy to Elastic Beanstalk
+on:
+  push:
+    branches:
+      - main  # Trigger only when you push to the 'main' branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create ZIP package
+        run: zip -r deploy.zip . -x "*.git*" "env/*"  # Zips everything except git and venv
+
+      - name: Deploy to AWS
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: "fitz_backend" # Go to EB console to find this
+          environment_name: "Fitzbackend-env" # e.g., Fitzbackend-env
+          version_label: "deploy-${{ github.sha }}"    # Unique name for this version
+          region: "eu-north-1"                        # Change to your AWS region
+          deployment_package: deploy.zip
