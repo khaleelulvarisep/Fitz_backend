@@ -144,7 +144,7 @@ SWAGGER_SETTINGS = {
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  
+    
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -192,26 +192,8 @@ WSGI_APPLICATION = 'fitz_backend.wsgi.application'
 #     }
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'fitz_db',
-#         'USER': 'fitz_user',
-#         'PASSWORD': '275498',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# # }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'PASSWORD': 'K#aleelulvaris@123',
-#         'HOST': 'db.icfmcszibyhlmcmoyivp.supabase.co',
-#         'PORT': '5432',
-#     }
-# }
+
+
 
 DATABASES = {
     'default': dj_database_url.parse(
@@ -258,4 +240,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
