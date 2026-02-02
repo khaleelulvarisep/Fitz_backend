@@ -24,7 +24,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise AuthenticationFailed("Invalid email or password.")
 
         if not user.is_active:
-            raise AuthenticationFailed("Your account has been blocked by the admin.")
+            raise AuthenticationFailed("Your account has been blocked by the admin khaleel.")
 
         self.user = user
         return super().validate(attrs)
