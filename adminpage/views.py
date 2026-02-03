@@ -27,7 +27,7 @@ class UserBlockApi(APIView):
                 "message": "User status updated successfully",
                 "is_active": user.is_active
             }, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_200_OK)
 
 #///////////////////Products///////////////////////////////
 
